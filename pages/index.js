@@ -1,3 +1,4 @@
+import axios from "axios";
 import { useState } from "react";
 import ChatBox from "../components/chatBox";
 import Footer from "../components/footer";
@@ -6,10 +7,38 @@ import Navbar from "../components/navbar";
 export default function Home() {
   const [phone, setPhone] = useState("");
 
+  console.log(process.env);
+
   function handleSubmit(e) {
     e.preventDefault();
-    console.log(phone);
-    setPhone("");
+
+    const payload = {
+      contacts: [
+        {
+          phone_number: phone,
+        },
+      ],
+      list_name: "webstore",
+    };
+
+    axios
+      .post(
+        `${process.env.NEXT_PUBLIC_OCTOPUSH_BASE_API_URL}/contact/create`,
+        payload,
+        {
+          headers: {
+            ContentType: "application/json",
+            "api-key": process.env.NEXT_PUBLIC_OCTOPUSH_API_KEY,
+            "api-login": process.env.NEXT_PUBLIC_OCTOPUSH_API_LOGIN,
+            "cache-control": "no-cache",
+          },
+        }
+      )
+      .then((response) => {
+        setPhone("");
+        console.log(response.data);
+      })
+      .catch((err) => console.error(err));
   }
 
   function handleChange(e) {
